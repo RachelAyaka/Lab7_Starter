@@ -45,35 +45,32 @@ function initializeServiceWorker() {
   // We first must register our ServiceWorker here before any of the code in
   // sw.js is executed.
   // B1. TODO - Check if 'serviceWorker' is supported in the current browser
-  const registerServiceWorker = async () => {
-
-    if ("serviceWorker" in navigator) {
+  if ("serviceWorker" in navigator) {
   // B2. TODO - Listen for the 'load' event on the window object.
-      window.addEventListener('load', (event) => {
+    window.addEventListener('load', (event) => {
   // Steps B3-B6 will be *inside* the event listener's function created in B2
   // B3. TODO - Register './sw.js' as a service worker (The MDN article
-        try {
-          const registration = navigator.serviceWorker.register("/sw.js", {
-            scope: "/",
-          });
+      try {
+        const registration = navigator.serviceWorker.register("/sw.js", {
+          scope: "/",
+        });
   //            "Using Service Workers" will help you here)
   // B4. TODO - Once the service worker has been successfully registered, console
   //            log that it was successful.
-          if (registration.installing) {
-            console.log("Service worker installing");
-          } else if (registration.waiting) {
-            console.log("Service worker installed");
-          } else if (registration.active) {
-            console.log("Service worker active");
-          }
-        } catch (error) {
+        if (registration.installing) {
+          console.log("Service worker installing");
+        } else if (registration.waiting) {
+          console.log("Service worker installed");
+        } else if (registration.active) {
+          console.log("Service worker active");
+        }
+      } catch (error) {
   // B5. TODO - In the event that the service worker registration fails, console
   //            log that it has failed.
-          console.log("Registrati9on failed");
-        }
+        console.log("Registrati9on failed");
+      }
   // STEPS B6 ONWARDS WILL BE IN /sw.js
-      });
-    }
+    });
   }
 }
 
@@ -89,27 +86,13 @@ async function getRecipes() {
   // EXPOSE - START (All expose numbers start with A)
   // A1. TODO - Check local storage to see if there are any recipes.
   //            If there are recipes, return them.
-  if (window.localStorage.length == 0) {
-    //there's nothing inside the localStorage
-    const http = new XMLHttpRequest();
-    for (i=0; i<RECIPE_URLS.length; i++ ) {
-      let url = RECIPE_URLS[i];
-      http.open("GET", url);
-      http.send();
-    }
-    localStorage.setItem('urls', JSON.stringify(RECIPE_URLS));
-  } else {
-    //there're recipes inside the localStorage
-    var values = [],
-        keys = Object.keys(localStorage),
-        i = keys.length;
 
-    while ( i-- ) {
-        values.push( localStorage.getItem(keys[i]) );
-    }
-
-    return values;
+  //new code
+  if (localStorage.length == RECIPE_URLS.length){
+    console.log(JSON.stringify(localStorage));
+    return JSON.stringify(localStorage);
   }
+
   /**************************/
   // The rest of this method will be concerned with requesting the recipes
   // from the network
@@ -120,35 +103,39 @@ async function getRecipes() {
   //            function (we call these callback functions). That function will
   //            take two parameters - resolve, and reject. These are functions
   //            you can call to either resolve the Promise or Reject it.
-  let promise = new Promise(async function(resolve, reject) {
+  return new Promise(async function(resolve, reject) {
   /**************************/
   // A4-A11 will all be *inside* the callback function we passed to the Promise
   // we're returning
   /**************************/
   // A4. TODO - Loop through each recipe in the RECIPE_URLS array constant
   //            declared above
-    for (i=0; i<RECIPE_URLS.length; i++ ) {
+  console.log('Welcome to Promise Callback function');
+    for (var i=0; i<RECIPE_URLS.length; i++ ) {
   // A5. TODO - Since we are going to be dealing with asynchronous code, create
   //            a try / catch block. A6-A9 will be in the try portion, A10-A11
   //            will be in the catch portion.
-      try {
+      try { 
   // A6. TODO - For each URL in that array, fetch the URL - MDN also has a great
   //            article on fetch(). NOTE: Fetches are ASYNCHRONOUS, meaning that
   //            you must either use "await fetch(...)" or "fetch.then(...)". This
   //            function is using the async keyword so we recommend "await"
         let url = RECIPE_URLS[i];
+        console.log(url);
         let response = await fetch(url);
+        console.log(response);
   // A7. TODO - For each fetch response, retrieve the JSON from it using .json().
   //            NOTE: .json() is ALSO asynchronous, so you will need to use
   //            "await" again
         let data = await response.json();
+        console.log(data)
   // A8. TODO - Add the new recipe to the recipes array
         recipes.push(data);
   // A9. TODO - Check to see if you have finished retrieving all of the recipes,
   //            if you have, then save the recipes to storage using the function
   //            we have provided. Then, pass the recipes array to the Promise's
   //            resolve() method.
-        if (response.status >= 200 && response.status<300) {
+        if (recipes.length == RECIPE_URLS.length) {
           saveRecipesToStorage(recipes);
           return resolve(recipes);
         }
@@ -159,6 +146,7 @@ async function getRecipes() {
         reject(new Error('Error!'));
       }
     }
+    console.log(recipes);
   });
 }
 
