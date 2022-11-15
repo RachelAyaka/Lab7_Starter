@@ -47,27 +47,22 @@ function initializeServiceWorker() {
   // B1. TODO - Check if 'serviceWorker' is supported in the current browser
   if ("serviceWorker" in navigator) {
   // B2. TODO - Listen for the 'load' event on the window object.
-    window.addEventListener('load', (event) => {
+    window.addEventListener('load', async () => {
   // Steps B3-B6 will be *inside* the event listener's function created in B2
   // B3. TODO - Register './sw.js' as a service worker (The MDN article
-      try {
-        const registration = navigator.serviceWorker.register("/sw.js", {
-          scope: "/",
-        });
+  try {
+    const registration = await navigator.serviceWorker.register("/sw.js", {
+      scope: "/",
+    });
   //            "Using Service Workers" will help you here)
   // B4. TODO - Once the service worker has been successfully registered, console
   //            log that it was successful.
-        if (registration.installing) {
-          console.log("Service worker installing");
-        } else if (registration.waiting) {
-          console.log("Service worker installed");
-        } else if (registration.active) {
-          console.log("Service worker active");
-        }
-      } catch (error) {
+    console.log('Using Service Workers');
+    console.log('Service Workers Successful')
+  } catch (error) {
   // B5. TODO - In the event that the service worker registration fails, console
   //            log that it has failed.
-        console.log("Registrati9on failed");
+        console.log("Registration failed");
       }
   // STEPS B6 ONWARDS WILL BE IN /sw.js
     });
@@ -121,14 +116,14 @@ async function getRecipes() {
   //            you must either use "await fetch(...)" or "fetch.then(...)". This
   //            function is using the async keyword so we recommend "await"
         let url = RECIPE_URLS[i];
-        console.log(url);
+        //console.log(url);
         let response = await fetch(url);
-        console.log(response);
+        //console.log(response);
   // A7. TODO - For each fetch response, retrieve the JSON from it using .json().
   //            NOTE: .json() is ALSO asynchronous, so you will need to use
   //            "await" again
         let data = await response.json();
-        console.log(data)
+        //console.log(data)
   // A8. TODO - Add the new recipe to the recipes array
         recipes.push(data);
   // A9. TODO - Check to see if you have finished retrieving all of the recipes,
@@ -146,7 +141,7 @@ async function getRecipes() {
         reject(new Error('Error!'));
       }
     }
-    console.log(recipes);
+    //console.log(recipes);
   });
 }
 
